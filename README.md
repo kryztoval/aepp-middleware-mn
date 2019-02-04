@@ -22,8 +22,9 @@ node middleware-server.js
 ## Supported or overriden queries
 ```
 GET /middleware/transactions/account/<account>?<limit>&<page>
-GET /middleware/transactions/interval/<from>/<to>
+GET /middleware/transactions/interval/<from>/<to>?<limit>&<page>
 GET /middleware/transactions/account/<account>/count
+GET /middleware/contracts/transactions/address/<address>?<limit>&<page>
 GET /v2/key-blocks/current/height
 GET /v2/generations/height/:height
 ```
@@ -35,8 +36,4 @@ Please note this forwarding makes this middleware effectively a proxy, and it wi
 
 
 ## Known differences from official middleware
-`GET /middleware/contracts/transactions/address/<address>` Not supported yet
-
-`GET /middleware/transactions/interval/<from>/<to>` lacks `?<limit>&<page>`
-
 `GET /v2/generations/height/:height` returns extra fields, `txs_count` specifically.

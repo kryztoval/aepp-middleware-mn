@@ -40,14 +40,15 @@ if(httpport) {
     res.header("Access-Control-Allow-Origin", "*");
     return next();
   });
-  http_server.get("/middleware/transactions/account/:account", getTransactionsForAccount);
-  http_server.get("/middleware/transactions/account/:account/count", getCountTransactionsForAccount);
+  http_server.get("/middleware/transactions/account/:account", getTransactionsByAccount);
+  http_server.get("/middleware/transactions/account/:account/count", getTransactionCountByAccount);
   http_server.get("/middleware/transactions/interval/:from/:to", getTransactionsFromRange);
-  http_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPricePerBlock);
+  http_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPriceByHeight);
+  http_server.get("/middleware/contracts/transactions/address/:address",getContractsTransactionsByAddress);
   http_server.get("/v2/key-blocks/current/height", getKeyblockCurrentHeight);
+  http_server.get("/v2/generations/height/:height", getGenerationByHeight);
   //http_server.get("/v2/key-blocks/current", getKeyblockCurrent);
   //http_server.get("/v2/key-blocks/height", getKeyblockByHeight);
-  http_server.get("/v2/generations/height/:height", getGenerationByHeight);
   http_server.on("NotFound", nodeForward); //forward anything we can't solve to the node
 }
 
@@ -65,14 +66,15 @@ if(httpsport) {
     res.header("Access-Control-Allow-Origin", "*");
     return next();
   });
-  https_server.get("/middleware/transactions/account/:account", getTransactionsForAccount);
-  https_server.get("/middleware/transactions/account/:account/count", getCountTransactionsForAccount);
+  https_server.get("/middleware/transactions/account/:account", getTransactionsByAccount);
+  https_server.get("/middleware/transactions/account/:account/count", getTransactionCountByAccount);
   https_server.get("/middleware/transactions/interval/:from/:to", getTransactionsFromRange);
-  https_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPricePerBlock);
+  https_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPriceByHeight);
+  https_server.get("/middleware/contracts/transactions/address/:address",getContractsTransactionsByAddress);
   https_server.get("/v2/key-blocks/current/height", getKeyblockCurrentHeight);
+  https_server.get("/v2/generations/height/:height", getGenerationByHeight);
   //https_server.get("/v2/key-blocks/current", getKeyblockCurrent);
   //https_server.get("/v2/key-blocks/height/:height", getKeyblockByHeight);
-  https_server.get("/v2/generations/height/:height", getGenerationByHeight);
   https_server.on("NotFound", nodeForward); //forward anything we can't solve to the node
 }
 
@@ -97,7 +99,7 @@ client.connect(function(err) {
 client.on("close", () => { console.log("-> lost connection"); });
 client.on("reconnect", () => { console.log("-> reconnected"); });
 
-/* web handlers */
+/* web handlers *//*
 function getKeyblockCurrent(req, res, next) {
   keyblocks.find({}).sort({_id:-1}).limit(1).toArray(function(error, docs) {
     if(!error && docs.length == 1) {
@@ -117,6 +119,29 @@ function getKeyblockByHeight(req, res, next) {
     }
     res.end();
   });
+}*/
+
+function getContractsTransactionsByAddress(req, res, next) {
+  var params = {};
+  var limit = 0;
+  var page = 0;
+  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
+  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
+
+  if(req.params.address) {
+    params["tx.contract_id"] = req.params.address;
+    params["tx.type"] = "ContractCallTx";
+
+    transactions.find(params).sort({"block_height":-1}).limit(limit).skip(limit*page).toArray(function(err, docs){
+      res.write( JSON.stringify({transactions:docs}));
+    	res.end();
+    });
+  } else {
+    error = {};
+    error.message = "There was a parameter error";
+    res.write( JSON.stringify(error));
+  	res.end();
+  }
 }
 
 function getKeyblockCurrentHeight(req, res, next) {
@@ -147,12 +172,12 @@ function nodeForward(req, res, next) {
   });
 }
 
-function getTransactionsForAccount(req, res, next) {
+function getTransactionsByAccount(req, res, next) {
   var params = {};
   var limit = 0;
   var page = 0;
-  if(req.query.limit) limit = parseInt(req.query.limit);
-  if(req.query.page) page = parseInt(req.query.page)-1;
+  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
+  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
 
   if(req.params.account) {
     params["$or"] = [{ "tx.recipient_id": req.params.account}, { "tx.sender_id": req.params.account}, {"tx.account_id": req.params.account}];
@@ -169,7 +194,7 @@ function getTransactionsForAccount(req, res, next) {
   }
 }
 
-function getCountTransactionsForAccount(req, res, next) {
+function getTransactionCountByAccount(req, res, next) {
   var params = {};
   if(req.params.account) {
     params["$or"] = [{ "tx.recipient_id": req.params.account}, { "tx.sender_id": req.params.account}, {"tx.account_id": req.params.account}];
@@ -188,6 +213,11 @@ function getCountTransactionsForAccount(req, res, next) {
 
 function getTransactionsFromRange(req, res, next) {
   var params = {};
+  var limit = 0;
+  var page = 0;
+  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
+  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
+
   if(req.params.from && req.params.to) {
     params["$and"] = [];
     params["$and"][0] = {};
@@ -198,7 +228,7 @@ function getTransactionsFromRange(req, res, next) {
     params["$and"][1]["block_height"]["$lte"] = Math.max(parseInt(req.params.from),parseInt(req.params.to));
 
     //console.log(params);
-    transactions.find(params).sort({"block_height":-1}).toArray(function(err, docs){
+    transactions.find(params).sort({"block_height":-1,_id:1}).limit(limit).skip(limit*page).toArray(function(err, docs){
       res.write( JSON.stringify({transactions: docs}));
     	res.end();
     });
@@ -230,7 +260,7 @@ function getGenerationByHeight(req, res, next) {
   }
 }
 
-function getAvgGasPricePerBlock(req, res, next) {
+function getAvgGasPriceByHeight(req, res, next) {
   var params = {};
   if(req.params.height) {
     params.block_height = parseInt(req.params.height);
