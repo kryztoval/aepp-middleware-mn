@@ -1,0 +1,13 @@
+{
+  "pollslow" : 1000,
+  "pollfast" : 0,
+  "polltick" : 500,
+  "pollsleep" : 30000,
+  "blocks_from_top" : 1,
+  "mongo_db" : "middleware",
+  "mongo_url" : "mongodb://server.ip.address:port",
+  "debug_level" : 1,
+  "base_url" : "http://local.host.net:port",
+  "httpsport" : 3011,
+  "httpport" : false
+}
