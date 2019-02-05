@@ -9,5 +9,7 @@
   "debug_level" : 1,
   "base_url" : "http://local.host.net:port",
   "httpsport" : 3011,
-  "httpport" : false
+  "httpport" : false,
+  "key_pem" : "/path/to/file/key.pem",
+  "cert_pem" : "/path/to/file/cert.pem"
 }

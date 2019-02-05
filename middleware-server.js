@@ -3,7 +3,7 @@ catch (exception) { }
 
 var pollslow, pollfast, polltick, pollsleep, blocks_from_top;
 var mongo_db, mongo_url, base_url, debug_level;
-var httpsport, httpport;
+var httpsport, httpport, key_pem, cert_pem;
 
 // polling configurations
 if (config && config.pollslow) { pollslow = config.pollslow; } else { pollslow = 1000; }
@@ -19,8 +19,13 @@ if (config && config.base_url) { base_url = config.base_url; } else { base_url =
 if (config && config.debug_level) { debug_level = config.debug_level; } else { debug_level = 1; }
 
 //middleware server configurations
-if (config && config.httpsport) { httpsport = config.httpsport; } else { httpsport = 3011; }
 if (config && config.httpport) { httpport = config.httpport; } else { httpport = false; }
+
+//middleware secure server configuration
+if (config && config.httpsport) { httpsport = config.httpsport; } else { httpsport = 3011; }
+if (config && config.key_pem) { key_pem = config.key_pem; } else { key_pem = "./key.pem"; }
+if (config && config.cert_pem) { cert_pem = config.cert_pem; } else { cert_pem = "./cert.pem"; }
+
 
 // dependencies: mongodb restify http-proxy
 const MongoClient = require("mongodb").MongoClient;
@@ -54,8 +59,8 @@ if(httpport) {
 
 /* https restify server */
 const https_options = {
-  key: fs.readFileSync("/etc/webmin/letsencrypt-key.pem", "utf8"),
-  cert: fs.readFileSync("/etc/webmin/letsencrypt-cert.pem", "utf8")
+  key: fs.readFileSync(key_pem, "utf8"),
+  cert: fs.readFileSync(cert_pem, "utf8")
 };
 var https_server;
 if(httpsport) {
