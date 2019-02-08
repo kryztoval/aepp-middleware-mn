@@ -72,9 +72,14 @@ function getTopBlock(release) {
   if(debug_level>1) console.log("getTopBlock");
     try {
       request(top_block, function(error,response,body) {
-        var parsed=JSON.parse(body);
-        status.keyblocks.top = parsed.height;
-        release();
+        try {
+          var parsed=JSON.parse(body);
+          status.keyblocks.top = parsed.height;
+        } catch(exception) {
+          console.log(exception);
+        } finally {
+          release();
+        }
       });
     }
     catch(exception) {
@@ -106,7 +111,14 @@ function getBlock(release) {  //checks the current block height in the chain
 function requestBlock(height,release) {
   request(base_block+height, function(error,response,body) {
     if(!error) {
-      var parsedblock=JSON.parse(body);
+      var parsedblock
+      try {
+       parsedblock = JSON.parse(body);
+      }
+      catch(exception) {
+        console.log(exception);
+        releae();
+      }
       if(!parsedblock.reason) {
         parsedblock._id=parsedblock.key_block.height;
         if(parsedblock.micro_blocks.length==0) {
