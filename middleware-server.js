@@ -77,6 +77,7 @@ if(httpsport) {
   https_server.get("/middleware/transactions/account/:account", getTransactionsByAccount);
   https_server.get("/middleware/transactions/account/:account/count", getTransactionCountByAccount);
   https_server.get("/middleware/transactions/interval/:from/:to", getTransactionsFromRange);
+  https_server.get("/middleware/transactions/interval/:from/:to/count", getTransactionCountFromRange);
   https_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPriceByHeight);
   https_server.get("/middleware/contracts/transactions/address/:address",getContractsTransactionsByAddress);
   https_server.get("/v2/key-blocks/current/height", getKeyblockCurrentHeight);
