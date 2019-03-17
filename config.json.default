@@ -11,5 +11,7 @@
   "httpsport" : 3011,
   "httpport" : false,
   "key_pem" : "/path/to/file/key.pem",
-  "cert_pem" : "/path/to/file/cert.pem"
+  "cert_pem" : "/path/to/file/cert.pem",
+  "limit_max" : 1000,
+  "limit_min" : 10
 }

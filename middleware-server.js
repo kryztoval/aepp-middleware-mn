@@ -12,17 +12,17 @@ if (config && config.polltick) { polltick = config.polltick; } else { polltick =
 if (config && config.pollsleep) { pollsleep = config.pollsleep; } else { pollsleep = 30000; }
 if (config && config.blocks_from_top) { blocks_from_top = config.blocks_from_top; } else { blocks_from_top = 1; }
 
-//middleware configurations
+// middleware configurations
 if (config && config.mongo_db) { mongo_db = config.mongo_db; } else { mongo_db = "middleware"; }
 if (config && config.mongo_url) { mongo_url = config.mongo_url; } else { mongo_url = "mongodb://127.0.0.1:27017"; }
 if (config && config.base_url) { base_url = config.base_url; } else { base_url = "http://127.0.0.1:3013"; }
 if (config && config.debug_level) { debug_level = config.debug_level; } else { debug_level = 1; }
 
-//middleware server configurations
-if (config && config.httpport) { httpport = config.httpport; } else { httpport = false; }
+// middleware server configurations
+if (config && config.httpport>0) { httpport = config.httpport; } else { httpport = false; }
 
-//middleware secure server configuration
-if (config && config.httpsport) { httpsport = config.httpsport; } else { httpsport = 3011; }
+// middleware secure server configuration
+if (config && config.httpsport>0) { httpsport = config.httpsport; } else { httpsport = false; }
 if (config && config.key_pem) { key_pem = config.key_pem; } else { key_pem = "./key.pem"; }
 if (config && config.cert_pem) { cert_pem = config.cert_pem; } else { cert_pem = "./cert.pem"; }
 
@@ -32,7 +32,7 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient(mongo_url,{ useNewUrlParser: true });
 
 var keyblocks, microblocks, transactions, pending;
-var fs = require("fs")
+var fs = require("fs");
 var restify = require("restify");
 
 /* http restify server */
@@ -48,20 +48,23 @@ if(httpport) {
   http_server.get("/middleware/transactions/account/:account", getTransactionsByAccount);
   http_server.get("/middleware/transactions/account/:account/count", getTransactionCountByAccount);
   http_server.get("/middleware/transactions/interval/:from/:to", getTransactionsFromRange);
+  http_server.get("/middleware/transactions/interval/:from/:to/count", getTransactionCountFromRange);
   http_server.get("/middleware/key-blocks/:height/gas-price", getAvgGasPriceByHeight);
   http_server.get("/middleware/contracts/transactions/address/:address",getContractsTransactionsByAddress);
   http_server.get("/v2/key-blocks/current/height", getKeyblockCurrentHeight);
   http_server.get("/v2/generations/height/:height", getGenerationByHeight);
-  //http_server.get("/v2/key-blocks/current", getKeyblockCurrent);
-  //http_server.get("/v2/key-blocks/height", getKeyblockByHeight);
   http_server.on("NotFound", nodeForward); //forward anything we can't solve to the node
 }
 
+var https_options;
 /* https restify server */
-const https_options = {
-  key: fs.readFileSync(key_pem, "utf8"),
-  cert: fs.readFileSync(cert_pem, "utf8")
-};
+if(httpsport!=false)  {
+  https_options = {
+    key: fs.readFileSync(key_pem, "utf8"),
+    cert: fs.readFileSync(cert_pem, "utf8")
+  };
+}
+
 var https_server;
 if(httpsport) {
   https_server = restify.createServer(https_options);
@@ -78,8 +81,6 @@ if(httpsport) {
   https_server.get("/middleware/contracts/transactions/address/:address",getContractsTransactionsByAddress);
   https_server.get("/v2/key-blocks/current/height", getKeyblockCurrentHeight);
   https_server.get("/v2/generations/height/:height", getGenerationByHeight);
-  //https_server.get("/v2/key-blocks/current", getKeyblockCurrent);
-  //https_server.get("/v2/key-blocks/height/:height", getKeyblockByHeight);
   https_server.on("NotFound", nodeForward); //forward anything we can't solve to the node
 }
 
@@ -104,34 +105,13 @@ client.connect(function(err) {
 client.on("close", () => { console.log("-> lost connection"); });
 client.on("reconnect", () => { console.log("-> reconnected"); });
 
-/* web handlers *//*
-function getKeyblockCurrent(req, res, next) {
-  keyblocks.find({}).sort({_id:-1}).limit(1).toArray(function(error, docs) {
-    if(!error && docs.length == 1) {
-      res.write( JSON.stringify(docs[0]));
-    }
-    res.end();
-  });
-}
-
-function getKeyblockByHeight(req, res, next) {
-  var params = {};
-  if (req.params.height) params._id=parseInt(req.params.height);
-  keyblocks.find(params).toArray(function(error, docs) {
-    if(!error && docs.length == 1) {
-      docs[0].key_block.txs_count = docs[0].txs_count;
-      res.write( JSON.stringify(docs[0].key_block));
-    }
-    res.end();
-  });
-}*/
-
 function getContractsTransactionsByAddress(req, res, next) {
   var params = {};
   var limit = 0;
   var page = 0;
-  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
-  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
+  if(req.query.limit) limit = Math.max(config && config.limit_min, parseInt(req.query.limit));
+  limit = Math.min(config && config.limit_max, limit)
+  if(req.query.page) page = Math.max(0, parseInt(req.query.page)-1);
 
   if(req.params.address) {
     params["tx.contract_id"] = req.params.address;
@@ -181,14 +161,19 @@ function getTransactionsByAccount(req, res, next) {
   var params = {};
   var limit = 0;
   var page = 0;
-  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
-  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
+  if(req.query.limit) limit = Math.max(config && config.limit_min, parseInt(req.query.limit));
+  limit = Math.min(config && config.limit_max, limit)
+  if(req.query.page) page = Math.max(0, parseInt(req.query.page)-1);
 
   if(req.params.account) {
     params["$or"] = [{ "tx.recipient_id": req.params.account}, { "tx.sender_id": req.params.account}, {"tx.account_id": req.params.account}];
 
     transactions.find(params).sort({"block_height":-1}).limit(limit).skip(limit*page).toArray(function(err, docs){
-      res.write( JSON.stringify({transactions:docs}));
+      if(err) {
+        res.write( JSON.stringify({ error: err }) )
+      } else {
+        res.write( JSON.stringify({transactions:docs}));
+      }
     	res.end();
     });
   } else {
@@ -216,12 +201,42 @@ function getTransactionCountByAccount(req, res, next) {
   }
 }
 
+function getTransactionCountFromRange(req, res, next) {
+  var params = {};
+  var limit = 0;
+  var page = 0;
+  if(req.query.limit) limit = Math.max(config && config.limit_min, parseInt(req.query.limit));
+  limit = Math.min(config && config.limit_max, limit)
+  if(req.query.page) page = Math.max(0, parseInt(req.query.page)-1);
+
+  if(req.params.from && req.params.to) {
+    params["$and"] = [];
+    params["$and"][0] = {};
+    params["$and"][0]["block_height"] = {};
+    params["$and"][0]["block_height"]["$gte"] = Math.min(parseInt(req.params.from),parseInt(req.params.to));
+    params["$and"][1] = {};
+    params["$and"][1]["block_height"] = {};
+    params["$and"][1]["block_height"]["$lte"] = Math.max(parseInt(req.params.from),parseInt(req.params.to));
+
+    //console.log(params);
+    transactions.countDocuments(params,function(err, count){
+      res.write( JSON.stringify({count:count}));
+    	res.end();
+    });
+  } else {
+    error = { message:"There was a parameter error" };
+    res.write( JSON.stringify(error));
+  	res.end();
+  }
+}
+
 function getTransactionsFromRange(req, res, next) {
   var params = {};
   var limit = 0;
   var page = 0;
-  if(req.query.limit) limit = Math.max(0,parseInt(req.query.limit));
-  if(req.query.page) page = Math.max(0,parseInt(req.query.page)-1);
+  if(req.query.limit) limit = Math.max(config && config.limit_min, parseInt(req.query.limit));
+  limit = Math.min(config && config.limit_max, limit)
+  if(req.query.page) page = Math.max(0, parseInt(req.query.page)-1);
 
   if(req.params.from && req.params.to) {
     params["$and"] = [];
