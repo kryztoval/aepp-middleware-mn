@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Aeternity Blockchain Explorer</title>
+
+    <meta name="description" content="Experimental Aeternity Blockchain Explorer">
+    <meta name="author" content="Cristobal E.">
+
+    <link href="https://unpkg.com/bootstrap@4.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+    <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+            <button type="button" class="btn btn-outline-danger float-right">AE NET</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 d-flex justify-content-center">
+			<ul class="nav nav-pills">
+				<li class="nav-item">
+					<a class="nav-link active" href="./dashboard.html">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="./generations.html">Generations</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="./transactions.html">Transactions</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+            &nbsp;
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+		</div>
+		<div class="col-md-2 bg-secondary">
+            <br><h2 class="text-center text-light">Latest Generation</h2>
+            <br><a href='#' id="viewlast" class="text-dark text-decoration-none"><div class="p-3 mb-2 bg-warning"><h6>View Last</h6></div></a>
+            <br><a href='/generations.html' class="text-dark text-decoration-none"><div class="p-3 mb-2 bg-warning"><h6>View All</h6></div></a>
+		</div>
+		<div class="col-md-4 bg-dark" style="height:20em">
+            <div class="container-fluid"><br>
+                <h3 class="text-light" >Generation</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Height</h6>
+                    <h4 class="text-light" id="height">-</h4>
+                    </div>
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Micro Blocks</h6>
+                    <h4 class="text-light" id="microblocks">-</h4>
+                    </div>
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Transactions</h6>
+                    <h4 class="text-light"  id="transactions">-</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                    </div>
+                </div>
+                <h3 class="text-light" >Key Block</h3>
+                <div class="row">
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Hash</h6>
+                    <h5 class="text-light" id="hash">-</h5>
+                    </div>
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Beneficiary</h6>
+                    <h5 class="text-light" id="beneficiary">-</h5>
+                    </div>
+                    <div class="col-md-4">
+                    <h6 class="text-muted">Age</h6>
+                    <h5 class="text-light" id="age">-</h5>
+                    <span id="time" class="invisible"></span>
+                    </div>
+                </div>
+                <hr class="p-1 bg-warning">
+            </div>
+        </div>
+		<div class="col-md-3">
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <br>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6 bg-dark">
+            <hr>
+            <div class="container-fluid" id="recent">
+                <strong><h3 class="text-light">Recent generations</h3></strong><br>
+            </div>
+            <hr>
+        </div>
+        <div class="col-md-3">
+        </div>
+    </div>
+</div>
+
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/bootstrap@4.2.1/dist/js/bootstrap.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

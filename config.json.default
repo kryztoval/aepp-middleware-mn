@@ -8,6 +8,7 @@
   "mongo_url" : "mongodb://server.ip.address:port",
   "debug_level" : 1,
   "base_url" : "http://local.host.net:port",
+  "enable_explorer" : true,
   "httpsport" : 3011,
   "httpport" : false,
   "key_pem" : "/path/to/file/key.pem",

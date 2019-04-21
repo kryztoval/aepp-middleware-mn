@@ -21,10 +21,11 @@ node middleware-server.js
 
 ## Supported or overriden queries
 ```
-GET /middleware/transactions/account/<account>?[limit]&[page]
-GET /middleware/transactions/interval/<from>/<to>?[limit]&[page]
-GET /middleware/transactions/interval/<from>/<to>/count
+GET /middleware/transactions/<hash>
 GET /middleware/transactions/account/<account>/count
+GET /middleware/transactions/account/<account>?[limit]&[page]
+GET /middleware/transactions/interval/<from>/<to>/count
+GET /middleware/transactions/interval/<from>/<to>?[limit]&[page]
 GET /middleware/contracts/transactions/address/<address>?[limit]&[page]
 GET /v2/key-blocks/current/height
 GET /v2/generations/height/:height
@@ -37,4 +38,18 @@ Please note this forwarding makes this middleware effectively a proxy, and it wi
 
 
 ## Known differences from official middleware
-`GET /v2/generations/height/:height` returns extra fields, `txs_count` specifically.
+Websocket support is not included in this middleware version
+`GET /middleware/transactions/interval/<from>/<to>/count` is not in the official middleware
+`GET /v2/generations/height/:height` returns an extra fields, specifically `txs_count`.
+`GET /middleware/size/current` and `GET /middleware/size/height/<height>` this value is the length from the original response from the server, not available right now
+`GET /middleware/channels/transactions/address/<address>` can't link the creation of the channel yet - needs to decode the the transaction
+`GET /middleware/contracts/all` I don't know how to do this yet
+
+## Implemented but not yet tested
+`GET /middleware/contracts/transactions/address/<address>`
+`GET /middleware/oracles/all?<limit>&<page>`
+`GET /middleware/transactions/rate/<from>/<to>`
+
+## Blockchain Explorer (Extra feature)
+* The middleware-server includes a simple explorer that will allow you to see what is in the middleware currently, made specifically to connect to the middleware
+The explorer is available at `GET /explorer/*`  after being enabled in the _config.json_ file.
