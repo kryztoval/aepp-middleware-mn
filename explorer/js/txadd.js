@@ -80,7 +80,7 @@ function subFormatdata(obj, callback, settings, data) {
     }
     if(data.transactions[i].block_height) {
       result.data[i][15] = "<h6>Block</h6>" +
-        "<a href='http://localhost:3030/blocks.html?height=" + data.transactions[i].block_height + "'>" +
+        "<a href='./blocks.html?height=" + data.transactions[i].block_height + "'>" +
         data.transactions[i].block_height + "</a>"
     } else {
       result.data[i][15] = ""
