@@ -36,7 +36,7 @@ function loadLast() {
             "<span data-toggle='tooltip' title='"+new Date(data.key_block.time)
             +"'>"+timeSince(data.key_block.time)+"</span>";
         $("#time").text(data.key_block.time);
-        $("#viewlast")[0].href = "/blocks.html?height=" + data._id;
+        $("#viewlast")[0].href = "./blocks.html?height=" + data._id;
     });
     max_height = top_height;
 }
