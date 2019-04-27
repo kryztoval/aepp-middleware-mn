@@ -11,7 +11,7 @@ $("#from_txt").focus();
 function formatData(obj, callback, settings) {
   var result = {};
   console.log(obj)
-  url = "https://ae.criesca.net:3011/middleware/transactions/interval/"+tx_from+"/"+tx_to+"?limit="+obj.length+"&page="+(obj.start/obj.length+1);
+  url = "/middleware/transactions/interval/"+tx_from+"/"+tx_to+"?limit="+obj.length+"&page="+(obj.start/obj.length+1);
    //+"&limit="+obj.length+"&page="+(obj.start/obj.length+1);
   jQuery.get(url, function(data, textStatus, jqXHR) {
     data = JSON.parse(data);
@@ -23,7 +23,7 @@ function getTransactions() {
   if($("#from_txt")[0] && $("#from_txt")[0].value) tx_from = $("#from_txt")[0].value;
   if($("#to_txt")[0] && $("#to_txt")[0].value) tx_to = $("#to_txt")[0].value;
 
-  url = "https://ae.criesca.net:3011/middleware/transactions/interval/"+tx_from+"/"+tx_to+"/count";
+  url = "/middleware/transactions/interval/"+tx_from+"/"+tx_to+"/count";
   jQuery.get(url, function(data, textStatus, jqXHR) {
     data = JSON.parse(data)
     $("#total_txs").text("Total Transactions: " + data.count);

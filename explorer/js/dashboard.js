@@ -3,7 +3,7 @@ var top_height;
 var max_height = 0;
 
 function refreshTop() {
-    jQuery.get("https://ae.criesca.net:3011/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
+    jQuery.get("/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
         data = JSON.parse(data);
         top_height = data.height;
         if(max_height<top_height) {
@@ -22,7 +22,7 @@ function refreshTime() {
 setInterval(refreshTime,1000);
 
 function loadLast() {
-    jQuery.get("https://ae.criesca.net:3011/v2/generations/height/"+top_height, function(data, textStatus, jqXHR) {
+    jQuery.get("/v2/generations/height/"+top_height, function(data, textStatus, jqXHR) {
         data = JSON.parse(data);
         $("#height")[0].innerHTML =
             "<a class='block-id' href='./blocks.html?height=" + data._id + "'>" + data._id + "</a>";
@@ -49,7 +49,7 @@ function loadRecent() {
         if($("#"+i).length==0) {
             $("#recent").append("<div class='row' id='"+i+"'></div>");
         }
-        jQuery.get("https://ae.criesca.net:3011/v2/generations/height/"+(base_height+i), function (data,textStatus, jqXHR) {
+        jQuery.get("/v2/generations/height/"+(base_height+i), function (data,textStatus, jqXHR) {
             data = JSON.parse(data);
             element = "<div class='col-md-2'><strong><h4 text-light'><a class='block-id' href='./blocks.html?height=" +
                 data._id + "'>" + data._id + "</a></div>" +
@@ -82,7 +82,7 @@ function refreshUndefined () {
   $('.tx-count').each( function(value, item) {
     if ($(item).text() === 'undefined') {
       i = $(item).closest('.row').find('.block-id').text()
-      jQuery.get("https://ae.criesca.net:3011/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
+      jQuery.get("/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
         data = JSON.parse(data)
         if(data.txs_count) {
           $(item).text(data.txs_count)

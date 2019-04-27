@@ -4,7 +4,7 @@ var max_height;
 var top_height;
 var min_height;
 
-jQuery.get( "https://ae.criesca.net:3011/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
+jQuery.get( "/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
     data=JSON.parse(data);
     max_height=data.height;
     min_height=data.height;
@@ -13,7 +13,7 @@ jQuery.get( "https://ae.criesca.net:3011/v2/key-blocks/current/height", function
 });
 
 function refreshTop() {
-    jQuery.get( "https://ae.criesca.net:3011/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
+    jQuery.get( "/v2/key-blocks/current/height", function(data, textStatus, jqXJR) {
         data=JSON.parse(data);
         top_height=data.height;
         if(max_height<top_height) {
@@ -31,7 +31,7 @@ function refreshTime() {
 setInterval(refreshTime,1000);
 
 function loadOne(i) {
-    jQuery.get("https://ae.criesca.net:3011/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
+    jQuery.get("/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
     data = JSON.parse(data);
     $("#kb"+data._id).append("<td><a href='./blocks.html?height="+data._id+"'>"+data._id+"</a></td>\
         <td data-toggle='tooltip' title='"+data.key_block.hash+"'>"+shortenString(data.key_block.hash)+"</td>\
@@ -71,7 +71,7 @@ function refreshUndefined() {
 }
 
 function refreshOne(i) {
-  jQuery.get("https://ae.criesca.net:3011/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
+  jQuery.get("/v2/generations/height/"+i, function(data, textStatus, jqXHR) {
     data = JSON.parse(data);
     if(data.txs_count) {
       $("#kb"+data._id+" > td:nth-child(4) > a").text(data.txs_count);
