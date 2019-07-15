@@ -78,12 +78,22 @@ function subFormatdata(obj, callback, settings, data) {
     } else {
       result.data[i][14] = ""
     }
+    if(data.transactions[i].tx.payload) {
+      if(data.transactions[i].tx.payload.startsWith("ba_")) {
+        payload = atob(data.transactions[i].tx.payload.split("ba_")[1])
+      } else {
+        payload = data.transactions[i].tx.payload
+      }
+      result.data[i][15] = "<span data-toggle='tooltip' title='"+data.transactions[i].tx.payload+"'><h6>Payload</h6>" + payload
+    } else {
+      result.data[i][15] = ""
+    }
     if(data.transactions[i].block_height) {
-      result.data[i][15] = "<h6>Block</h6>" +
+      result.data[i][16] = "<h6>Block</h6>" +
         "<a href='./blocks.html?height=" + data.transactions[i].block_height + "'>" +
         data.transactions[i].block_height + "</a>"
     } else {
-      result.data[i][15] = ""
+      result.data[i][16] = ""
     }
   }
   return callback(result)
