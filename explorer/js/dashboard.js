@@ -94,3 +94,31 @@ function refreshUndefined () {
 }
 
 setInterval(refreshUndefined, 5000);
+
+function buttonSearch () {
+  e = document.getElementById("search").value
+  if(e.length > 0) {
+    if(e.startsWith("ak_")) {
+      window.location.replace("https://ae.criesca.net:3011/explorer/address.html?address="+e)
+    }
+    if(e.startsWith("ba_")) {
+      r = atob(e.substr(3))
+      alert("The parsed string is: [" + r.substr(0,r.length-4) + "]")
+    }
+    if(e.startsWith("kh_")) {
+      window.location.replace("https://ae.criesca.net:3011/v2/key-blocks/hash/"+e)
+    }
+    if(e.startsWith("mh_")) {
+      window.location.replace("https://ae.criesca.net:3011/v2/micro-blocks/hash/"+e+"/header")
+    }
+    if(e.startsWith("th_")) {
+      window.location.replace("https://ae.criesca.net:3011/explorer/tx.html?hash="+e);
+    }
+    /* Block height is not supported
+    if(!isNaN(e)) {
+      window.location.replace("https://ae.criesca.net:3011/explorer/blocks.html?height="+e);
+    }
+    */
+    alert("I'm sorry but I do not know what to do with that input yet.")
+  }
+}

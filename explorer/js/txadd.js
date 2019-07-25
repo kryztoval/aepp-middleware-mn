@@ -81,10 +81,14 @@ function subFormatdata(obj, callback, settings, data) {
     if(data.transactions[i].tx.payload) {
       if(data.transactions[i].tx.payload.startsWith("ba_")) {
         payload = atob(data.transactions[i].tx.payload.split("ba_")[1])
+        payload = payload.substr(0, payload.length-4)
       } else {
         payload = data.transactions[i].tx.payload
       }
-      result.data[i][15] = "<span data-toggle='tooltip' title='"+data.transactions[i].tx.payload+"'><h6>Payload</h6>" + payload
+      if(payload.length > 0)
+        result.data[i][15] = "<span data-toggle='tooltip' title='"+data.transactions[i].tx.payload+"'><h6>Payload</h6>" + payload
+      else
+        result.data[i][15] = ""
     } else {
       result.data[i][15] = ""
     }

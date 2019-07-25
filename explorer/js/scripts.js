@@ -69,7 +69,18 @@ function transverse(obj, result) {
         if(typeof(obj[i])=="object" || Array.isArray((obj[i]))) {
           result += transverse(obj[i], "<tr><td colspan='2'><table class='table'>") + "</table></td></tr>";
         } else {
-          result += "<tr><td class='text-primary'>" + i + "</td><td>" + obj[i] + "</td><td class='text-danger'>" + typeof(obj[i]) + "</td></tr>";
+          if(typeof(obj[i]) == "string") {
+            processed = obj[i]
+            if(obj[i].startsWith("ba_")) {
+              r = atob(obj[i].substr(3))
+              if(r.length > 4) {
+                  processed = obj[i] + "<br>(Decoded: [" + r.substr(0,r.length-4) + "])"
+              }
+            }
+          }
+          result += "<tr><td class='text-primary'>" + i + "</td>" +
+                    "<td>" + processed + "</td>" +
+                    "<td class='text-danger'>" + typeof(obj[i]) + "</td></tr>";
         }
     }
     return result;
