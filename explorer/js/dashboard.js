@@ -120,5 +120,6 @@ function buttonSearch () {
     }
     */
     //alert("I'm sorry but I do not know what to do with that input yet.")
+    return false
   }
 }
