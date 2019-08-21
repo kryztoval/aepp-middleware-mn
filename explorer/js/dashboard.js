@@ -119,6 +119,6 @@ function buttonSearch () {
       window.location.replace("https://ae.criesca.net:3011/explorer/blocks.html?height="+e);
     }
     */
-    alert("I'm sorry but I do not know what to do with that input yet.")
+    //alert("I'm sorry but I do not know what to do with that input yet.")
   }
 }
