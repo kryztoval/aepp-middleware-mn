@@ -276,6 +276,10 @@ function calcKeyblocks(release) {
                 release();
               });
             } else {
+              if(result.length==0) {
+                console.log(doc[0].key_block.height, 'clearBlockData', 'because of an inconsistent state')
+                clearBlockData(doc[0].key_block.height)
+              }
               release();
             }
           });
@@ -289,14 +293,18 @@ function calcKeyblocks(release) {
   });
 }
 
+function clearBlockData(blockHeight) {
+  keyblocks.deleteOne({_id:blockHeight},function(error, docs) {});
+  microblocks.deleteMany({height:blockHeight},function(error, docs) {});
+  transactions.deleteMany({block_height:blockHeight},function(error, docs) {});
+  pending.deleteMany({height:blockHeight},function(error,docs) {});
+  requestBlock(blockHeight,function() {});
+}
+
 function retryFailKeyblocks() {
   pending.find({ mh: "error"}).sort({height:1}).limit(1).toArray(function(error, results) {
     for(i in results) {
-      keyblocks.deleteOne({_id:results[i].height},function(error, docs) {});
-      microblocks.deleteMany({height:results[i].height},function(error, docs) {});
-      transactions.deleteMany({block_height:results[i].height},function(error, docs) {});
-      pending.deleteMany({height:results[i].height},function(error,docs) {});
-      requestBlock(results[i].height,function() {});
+      clearBlockData(results[i].height)
     }
   });
   keyblocks.find({txs_count:{$exists:false}}).sort({_id:1}).limit(1).toArray(function(error, results) {
