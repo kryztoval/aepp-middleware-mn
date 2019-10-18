@@ -114,11 +114,9 @@ function buttonSearch () {
     if(e.startsWith("th_")) {
       window.location.replace("https://ae.criesca.net:3011/explorer/tx.html?hash="+e);
     }
-    /* Block height is not supported
-    if(!isNaN(e)) {
-      window.location.replace("https://ae.criesca.net:3011/explorer/blocks.html?height="+e);
+    if(parseInt(e) > 0) {
+      window.location.replace("/explorer/blocks.html?height="+parseInt(e).toString());
     }
-    */
     //alert("I'm sorry but I do not know what to do with that input yet.")
     return false
   }
