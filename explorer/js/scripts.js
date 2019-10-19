@@ -67,7 +67,7 @@ function convertToTable(obj) {
 function transverse(obj, result) {
     for(i in obj) {
         if(typeof(obj[i])=="object" || Array.isArray((obj[i]))) {
-          result += transverse(obj[i], "<tr><td colspan='2'><table class='table'>") + "</table></td></tr>";
+          result += transverse(obj[i], "<tr><td>"+i+"</td><td colspan='2'><table class='table'>") + "</table></td></tr>";
         } else {
           processed = obj[i]
           if(typeof(obj[i]) == "string") {

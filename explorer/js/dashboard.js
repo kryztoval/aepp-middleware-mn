@@ -99,20 +99,20 @@ function buttonSearch () {
   e = document.getElementById("search").value
   if(e.length > 0) {
     if(e.startsWith("ak_")) {
-      window.location.replace("https://ae.criesca.net:3011/explorer/address.html?address="+e)
+      window.location.replace("/explorer/address.html?address="+e)
     }
     if(e.startsWith("ba_")) {
       r = atob(e.substr(3))
       alert("The parsed string is: [" + r.substr(0,r.length-4) + "]")
     }
     if(e.startsWith("kh_")) {
-      window.location.replace("https://ae.criesca.net:3011/v2/key-blocks/hash/"+e)
+      window.location.replace("/explorer/blocks.html?hash="+e)
     }
     if(e.startsWith("mh_")) {
-      window.location.replace("https://ae.criesca.net:3011/v2/micro-blocks/hash/"+e+"/header")
+      window.location.replace("/explorer/blocks.html?microblock="+e)
     }
     if(e.startsWith("th_")) {
-      window.location.replace("https://ae.criesca.net:3011/explorer/tx.html?hash="+e);
+      window.location.replace("/explorer/tx.html?hash="+e);
     }
     if(parseInt(e) > 0) {
       window.location.replace("/explorer/blocks.html?height="+parseInt(e).toString());
