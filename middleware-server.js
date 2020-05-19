@@ -100,7 +100,7 @@ if(httpsport) {
   https_server.get('/middleware/oracles/all', getOracles)
   if (enable_explorer) { https_server.get('/explorer', function (req, res, next) { res.redirect('/explorer/', next) }) }
   if (enable_explorer) { https_server.get('/explorer/*', staticFiles) }
-  if (enable_explorer) { http_server.get('/favicon.ico', staticFiles) }
+  if (enable_explorer) { https_server.get('/favicon.ico', staticFiles) }
   https_server.on('NotFound', nodeForward) // forward anything we can't solve to the node
 }
 
