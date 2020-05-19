@@ -65,7 +65,7 @@ function subFormatdata(obj, callback, settings, data) {
       result.data[i][12] = ""
     }
     if(data.transactions[i].tx.amount) {
-      result.data[i][13] = "<span data-toggle='tooltip' title='"+(parseFloat(data.transactions[i].tx.amount)/1000000000000000000)+"'><h6>Amount</h6>"+(parseFloat(data.transactions[i].tx.amount)/1000000000000000000).toFixed(4)
+      result.data[i][13] = "<span data-toggle='tooltip' title='"+(parseFloat(data.transactions[i].tx.amount)/1000000000000000000)+"'><h6>Amount</h6>"+(parseFloat(data.transactions[i].tx.amount)/1000000000000000000).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 0, maximumFractionDigits: 18, style: 'decimal'})
     } else {
       result.data[i][13] = ""
     }

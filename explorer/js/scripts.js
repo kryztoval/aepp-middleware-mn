@@ -61,22 +61,28 @@ function timeSince(timevar) {
 
 
 function convertToTable(obj) {
-    return transverse(obj, "<table class='table'>") + "</table>";
+    return transverse(obj, "<table class='maintable'>") + "</table>";
 }
 
 function transverse(obj, result) {
     for(i in obj) {
         if(typeof(obj[i])=="object" || Array.isArray((obj[i]))) {
-          result += transverse(obj[i], "<tr><td>"+i+"</td><td colspan='2'><table class='table'>") + "</table></td></tr>";
+          result += transverse(obj[i], "<tr><td>"+i+"</td><td colspan='2'><table class='subtable'>") + "</table></td></tr>";
         } else {
-          processed = obj[i]
-          if(typeof(obj[i]) == "string") {
-            if(obj[i].startsWith("ba_")) {
-              r = atob(obj[i].substr(3))
-              if(r.length > 4) {
-                  processed = obj[i] + "<br>(Decoded: [" + r.substr(0,r.length-4) + "])"
+          switch(i) {
+            case "balance": case "amount": case "fee": 
+              processed = (obj[i]/1000000000/1000000000).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 4, maximumFractionDigits: 18, style: 'decimal'}) + ' AE'
+            break;
+            case "payload":
+              if(obj[i].startsWith("ba_")) {
+                r = atob(obj[i].substr(3))
+                if(r.length > 4) {
+                  processed = /* obj[i] + "<br>(Decoded: [" + */ r.substr(0,r.length-4) /* + "])" */
+                }
               }
-            }
+            break;
+            default:
+              processed = obj[i]
           }
           result += "<tr><td class='text-primary'>" + i + "</td>" +
                     "<td>" + processed + "</td>" +

@@ -63,6 +63,7 @@ if(httpport) {
   http_server.get('/middleware/oracles/all', getOracles)
   if (enable_explorer) { http_server.get('/explorer', function (req, res, next) { res.redirect('/explorer/', next) }) }
   if (enable_explorer) { http_server.get('/explorer/*', staticFiles) }
+  if (enable_explorer) { http_server.get('/favicon.ico', staticFiles) }
   http_server.on("NotFound", nodeForward); //forward anything we can't solve to the node
 }
 
@@ -99,11 +100,13 @@ if(httpsport) {
   https_server.get('/middleware/oracles/all', getOracles)
   if (enable_explorer) { https_server.get('/explorer', function (req, res, next) { res.redirect('/explorer/', next) }) }
   if (enable_explorer) { https_server.get('/explorer/*', staticFiles) }
+  if (enable_explorer) { http_server.get('/favicon.ico', staticFiles) }
   https_server.on('NotFound', nodeForward) // forward anything we can't solve to the node
 }
 
 function staticFiles (req, res, next) {
   var filename = 'index.html'
+  if(req.url == '/favicon.ico') { filename = 'favicon.ico' }
   if (req.params["*"]) {
     filename = req.params["*"]
   }
@@ -113,7 +116,7 @@ function staticFiles (req, res, next) {
       return
     }
 
-    res.setHeader('Content-Type', 'text/html')
+    //res.setHeader('Content-Type', 'text/html')
     res.writeHead(200)
     res.end(data)
     next()

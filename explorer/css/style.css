@@ -1,1 +1,28 @@
-# Empty CSS file for your own CSS
+table > tbody > tr > td {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+table.maintable > tbody > tr {
+  border: 1px;
+  border-style: none;
+  border-bottom-style: solid;
+  border-top-style: solid;
+}
+
+table.subtable {
+  border-collapse: collapse;
+  border-style: hidden;
+}
+
+table.subtable > tbody > tr {
+  border: 1px;
+  border-style: solid;
+  border-color: #DDD;
+}
+
+table.subtable > tbody > tr > td {
+  border: 1px;
+  border-style: solid;
+  border-color: #DDD;
+}

@@ -7,7 +7,7 @@
     "http-proxy": "^1.17.0",
     "mongodb": "^3.1.12",
     "request": "^2.88.0",
-    "restify": "^7.6.0"
+    "restify": "^8.5.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"
