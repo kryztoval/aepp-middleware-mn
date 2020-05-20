@@ -36,7 +36,7 @@ function loadOne(i) {
     $("#kb"+data._id).append("<td><a href='./blocks.html?height="+data._id+"'>"+data._id+"</a></td>\
         <td data-toggle='tooltip' title='"+data.key_block.hash+"'>"+shortenString(data.key_block.hash)+"</td>\
         <td>"+data.micro_blocks.length+"</td>\
-        <td><a href='./transactions.html?from="+data._id+"&to="+data._id+"'>"+data.txs_count+"</a></td>\
+        <td><a href='./transactions.html?from="+data._id+"'>"+data.txs_count+"</a></td>\
         <td data-toggle='tooltip' title='"+data.key_block.beneficiary+"'><a href='./address.html?address="+data.key_block.beneficiary+"'>"+shortenString(data.key_block.beneficiary)+"</a></td>\
         <td data-toggle='tooltip' title='"+new Date(data.key_block.time)+"'>"+timeSince(data.key_block.time)+"</td>\
         <td class='time' style='display:none'>"+data.key_block.time+"</td>");

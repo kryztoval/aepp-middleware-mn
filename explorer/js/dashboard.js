@@ -27,7 +27,7 @@ function loadLast() {
         $("#height")[0].innerHTML =
             "<a class='block-id' href='./blocks.html?height=" + data._id + "'>" + data._id + "</a>";
         $("#microblocks").text(data.micro_blocks.length);
-        $("#transactions")[0].innerHTML = "<a class='tx-count' href='./transactions.html?from="+data._id+"&to="+data._id+"'>"+data.txs_count+"</a>"
+        $("#transactions")[0].innerHTML = "<a class='tx-count' href='./transactions.html?from="+data._id+"'>"+data.txs_count+"</a>"
             //.text(data.txs_count);
         $("#hash").text(shortenString(data.key_block.hash));
         $("#beneficiary")[0].innerHTML =
@@ -56,7 +56,7 @@ function loadRecent() {
                 "<div class='col-md-2'><span class='text-muted'>Micro Blocks</span> <strong><span class='text-light'>"
                 + data.micro_blocks.length + "</span></strong></div>" +
                 "<div class='col-md-2'><span class='text-muted'>Transactions</span> <strong><span class='text-light'>"
-                + "<a class='tx-count' href='./transactions.html?from="+data._id+"&to="+data._id+"'>"+data.txs_count+"</a>" + "</span></strong></div>" +
+                + "<a class='tx-count' href='./transactions.html?from="+data._id+"'>"+data.txs_count+"</a>" + "</span></strong></div>" +
                 "<div class='col-md-6'>&nbsp;<span class='text-muted'>beneficiary</span> <strong><span class='text-light'>"
                 + "<a data-toggle='tooltip' title='" + data.key_block.beneficiary +"' href='./address.html?address="
                 + data.key_block.beneficiary + "'>" + shortenString(data.key_block.beneficiary)

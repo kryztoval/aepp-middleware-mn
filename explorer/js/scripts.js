@@ -59,7 +59,6 @@ function timeSince(timevar) {
     return(result);
 }
 
-
 function convertToTable(obj) {
     return transverse(obj, "<table class='maintable'>") + "</table>";
 }
@@ -70,17 +69,47 @@ function transverse(obj, result) {
           result += transverse(obj[i], "<tr><td>"+i+"</td><td colspan='2'><table class='subtable'>") + "</table></td></tr>";
         } else {
           switch(i) {
+            case "time":
+              processed = "<span title= '" + obj[i].toString() + "'>" + new Date(obj[i]).toUTCString() + "</span> (" + timeSince(obj[i]) + " ago)"
+            break;
             case "balance": case "amount": case "fee": 
               processed = (obj[i]/1000000000/1000000000).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 4, maximumFractionDigits: 18, style: 'decimal'}) + ' AE'
             break;
+            case "block_height": case "height":
+              processed = "<a href='/explorer/blocks.html?height=" + obj[i] + "'>" + obj[i] + "</a>"
+            break;
+            case "recipient_id": case "account_id": case "sender_id": case "miner": case "beneficiary": case "id": case "caller_id":
+              if(obj[i].startsWith("ak_")) {
+                processed = "<a href='/explorer/address.html?address=" + obj[i] + "'>" + obj[i] + "</a>"
+                break;
+              }
+            case "txs_count":
+              if(obj[i] > 0) {
+                processed = "<a href='/explorer/transactions.html?from=" + GetURLParameter('height') + "'>" + obj[i] + "</a>"
+                break;
+              }
+            case "block_hash": case "prev_hash":
+              if(obj[i].startsWith("mh_")) {
+                processed = "<a href='/explorer/blocks.html?microblock=" + obj[i] + "'>" + obj[i] + "</a>"
+                break;
+              }
             case "payload":
               if(obj[i].startsWith("ba_")) {
                 r = atob(obj[i].substr(3))
                 if(r.length > 4) {
                   processed = /* obj[i] + "<br>(Decoded: [" + */ r.substr(0,r.length-4) /* + "])" */
                 }
+                break;
               }
-            break;
+            case "hash":
+              if(obj[i].startsWith("th_")) {
+                processed = "<a href='/explorer/tx.html?hash=" + obj[i] + "'>" + obj[i] + "</a>"
+                break;
+              }
+              if(obj[i].startsWith("mh_")) {
+                processed = "<a href='/explorer/blocks.html?microblock=" + obj[i] + "'>" + obj[i] + "</a>"
+                break;
+              }
             default:
               processed = obj[i]
           }
