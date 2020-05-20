@@ -78,7 +78,7 @@ function transverse(obj, result) {
             case "time":
               processed = "<span title= '" + obj[i].toString() + "'>" + new Date(obj[i]).toUTCString() + "</span> (" + timeSince(obj[i]) + " ago)"
             break;
-            case "balance": case "amount": case "fee": 
+            case "balance": case "amount": case "fee": case "name_fee":
               processed = (obj[i]/1000000000/1000000000).toLocaleString('en-US', {useGrouping: true, minimumFractionDigits: 4, maximumFractionDigits: 18, style: 'decimal'}) + ' AE'
               processed = "<span title='" + obj[i].toLocaleString('en-US', {useGrouping: true, maximumFractionDigits: 0, style: 'decimal'}) + " aettos'>" + processed + "</span>"
             break;
@@ -93,6 +93,11 @@ function transverse(obj, result) {
             case "txs_count":
               if(obj[i] > 0) {
                 processed = "<a href='/explorer/transactions.html?from=" + GetURLParameter('height') + "'>" + obj[i] + "</a>"
+                break;
+              }
+            case "name":
+              if(typeof(obj[i]) == "string" && obj[i].endsWith(".chain")) {
+                processed = "<a href='/explorer/names.html?name=" + obj[i] + "'>" + obj[i] + "</a>"
                 break;
               }
             case "payload":
