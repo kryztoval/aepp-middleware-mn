@@ -114,6 +114,9 @@ function buttonSearch () {
     if(e.startsWith("th_")) {
       window.location.replace("/explorer/tx.html?hash="+e);
     }
+    if(e.endsWith(".chain")) {
+      window.location.replace("/explorer/names.html?name="+e);
+    }
     if(parseInt(e) > 0) {
       window.location.replace("/explorer/blocks.html?height="+parseInt(e).toString());
     }
