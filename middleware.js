@@ -3,7 +3,6 @@ catch (exception) { }
 
 var pollslow, pollfast, polltick, pollsleep, blocks_from_top;
 var mongo_db, mongo_url, base_url, debug_level;
-var httpsport, httpport;
 
 // polling configurations
 if (config && config.pollslow) { pollslow = config.pollslow; } else { pollslow = 1000; }

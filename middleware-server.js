@@ -20,7 +20,7 @@ if (config && config.base_url) { base_url = config.base_url; } else { base_url =
 if (config && config.debug_level) { debug_level = config.debug_level; } else { debug_level = 1; }
 
 // middleware server configurations
-if (config && config.httpport>0) { httpport = config.httpport; } else { httpport = false; }
+if (config && config.httpport>0) { httpport = config.httpport; } else { httpport = 3011; }
 
 // middleware secure server configuration
 if (config && config.httpsport>0) { httpsport = config.httpsport; } else { httpsport = false; }

@@ -7,7 +7,7 @@ This is a caching layer for Epoch. It reads the chain and records key-blocks and
 ## How to use
 
 - Install a mongo db somewhere. Works with versions >= 3.6, at least.
-- Configure the connections and settings in the json file
+- Copy `config.json.default` to `config.json` and change to configure the connections and settings for your instance
 - Install dependencies with `npm -i`
 
 ## How to run
@@ -32,18 +32,18 @@ GET /v2/generations/height/:height
 ```
 Any other query not supported by the middleware is forwarded directly to the AEternity node.
 
-The middleware supports http and https service mode, it can connect to http and https aeternity nodes, it can redirect between http and https as well.
+The middleware supports http and https service mode, it can connect to http and https AEternity nodes, it can redirect between http and https as well.
 
 Please note this forwarding makes this middleware effectively a proxy, and it will work even between different protocols.
 
 
 ## Known differences from official middleware
 Websocket support is not included in this middleware version
-`GET /middleware/transactions/interval/<from>/<to>/count` is not in the official middleware
-`GET /v2/generations/height/:height` returns an extra fields, specifically `txs_count`.
-`GET /middleware/size/current` and `GET /middleware/size/height/<height>` this value is the length from the original response from the server, not available right now
-`GET /middleware/channels/transactions/address/<address>` can't link the creation of the channel yet - needs to decode the the transaction
-`GET /middleware/contracts/all` I don't know how to do this yet
+`GET /middleware/transactions/interval/<from>/<to>/count` is not in the official middleware, this is used to fill tables efficiently
+`GET /v2/generations/height/:height` returns an extra fields, specifically `txs_count` which has the total transactions at this block
+`GET /middleware/size/current` and `GET /middleware/size/height/<height>` this value is the length from the original response from the server, this field is not calculated neither is it stored
+`GET /middleware/channels/transactions/address/<address>` can't link the creation of the channel yet - needs to decode the transaction
+`GET /middleware/contracts/all` I don't know how to do this yet, this needs decoding of the contract calls
 
 ## Implemented but not yet tested
 `GET /middleware/contracts/transactions/address/<address>`
