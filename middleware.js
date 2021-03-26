@@ -48,8 +48,7 @@ client.connect(function(err) {
     transactions = client.db(mongo_db).collection("transactions");;
     pending = client.db(mongo_db).collection("pending");;
 
-    //setInterval(retryFailKeyblocks,pollsleep);
-
+/*
     async function clearMe() {
       for(i = 395000; i<=400000; i++)
       {
@@ -57,6 +56,7 @@ client.connect(function(err) {
       }
       process.exit()
     } //clearMe()
+*/
 
     setInterval(retryFailKeyblocks, pollsleep)
     getBlock(getBlockLoop);
@@ -390,3 +390,44 @@ setInterval(function() {
     console.log(text);
   }
 },pollsleep*10);
+
+function createIndexesCallback(error, result) {
+  if(error) {
+    console.log("Index creation Error: '", error, "'")
+  }
+}
+
+function createIndexes() {
+  keyblocks.createIndex({_id: 1}, createIndexesCallback)
+  keyblocks.createIndex({"key_block.beneficiary": 1}, createIndexesCallback)
+  keyblocks.createIndex({"key_block.hash": 1}, {unique: true}, createIndexesCallback)
+  keyblocks.createIndex({"key_block.height": 1}, {unique: true}, createIndexesCallback)
+  keyblocks.createIndex({"key_block.time": 1}, createIndexesCallback)
+  keyblocks.createIndex({"txs_count": 1}, createIndexesCallback)
+  microblocks.createIndex({_id: 1}, createIndexesCallback)
+  microblocks.createIndex({height: 1}, createIndexesCallback)
+  microblocks.createIndex({time: 1}, createIndexesCallback)
+  transactions.createIndex({_id: 1}, createIndexesCallback)
+  transactions.createIndex({block_hash: 1}, createIndexesCallback)
+  transactions.createIndex({block_height: -1}, createIndexesCallback)
+  transactions.createIndex({block_height: 1, time: 1}, createIndexesCallback)
+  transactions.createIndex({block_height: 1}, createIndexesCallback)
+  transactions.createIndex({time: -1}, createIndexesCallback)
+  transactions.createIndex({time: 1}, createIndexesCallback)
+  transactions.createIndex({"tx.account_id": 1}, createIndexesCallback)
+  transactions.createIndex({"tx.account_id": 1, block_height: -1}, createIndexesCallback)
+  transactions.createIndex({"tx.recipient_id": 1}, createIndexesCallback)
+  transactions.createIndex({"tx.recipient_id": 1, block_height: -1}, createIndexesCallback)
+  transactions.createIndex({"tx.sender_id": 1}, createIndexesCallback)
+  transactions.createIndex({"tx.sender_id": 1, block_height: -1}, createIndexesCallback)
+  transactions.createIndex({"tx.type": 1}, createIndexesCallback)
+  pending.createIndex({_id: 1}, createIndexesCallback)
+  pending.createIndex({height: 1}, createIndexesCallback)
+  pending.createIndex({mh: 1, height: 1}, createIndexesCallback)
+  pending.createIndex({mh:1, time: 1}, createIndexesCallback)
+  pending.createIndex({mh: 1, time: 1, height: 1}, createIndexesCallback)
+  pending.createIndex({th: 1, height: 1}, createIndexesCallback)
+  pending.createIndex({th: 1, time: 1}, createIndexesCallback)
+  pending.createIndex({th: 1, time: 1, height: 1}, createIndexesCallback)
+  pending.createIndex({time: 1}, createIndexesCallback)
+}
