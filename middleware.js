@@ -24,7 +24,7 @@ const top_block=base_url+"/v2/key-blocks/current";
 
 // dependencies: mongodb request
 const MongoClient = require("mongodb").MongoClient;
-const client = new MongoClient(mongo_url,{ useNewUrlParser: true });
+const client = new MongoClient(mongo_url,{ useNewUrlParser: true, useUnifiedTopology: true });
 
 var request = require("request");
 
@@ -34,12 +34,15 @@ status.microblocks = {};
 status.transactions = {};
 status.keyblocks.current = 0;
 status.keyblocks.top = 0;
+status.reset = {};
+status.reset.block = 0;
+status.reset.retry = 1;
 
 var keyblocks, microblocks, transactions, pending;
 
 client.connect(function(err) {
   if(!err) {
-    if(debug_level>0) console.log("Connected successfully to server");
+    if(debug_level>0) console.log("Connected successfully to Mongo server");
     keyblocks = client.db(mongo_db).collection("keyblocks");
     microblocks = client.db(mongo_db).collection("microblocks");
     transactions = client.db(mongo_db).collection("transactions");;
@@ -47,13 +50,21 @@ client.connect(function(err) {
 
     //setInterval(retryFailKeyblocks,pollsleep);
 
+    async function clearMe() {
+      for(i = 395000; i<=400000; i++)
+      {
+        await clearBlockData(i);
+      }
+      process.exit()
+    } //clearMe()
+
+    setInterval(retryFailKeyblocks, pollsleep)
     getBlock(getBlockLoop);
     getTopBlock(getTopBlockLoop);
     getMicroBlockLoop();
     getTransactionLoop();
     cleanUpPendingLoop();
     calcKeyblocksLoop();
-
   } else {
     if(debug_level>0) console.log(err);
     process.exit();
@@ -71,14 +82,13 @@ function getTopBlock(release) {
   if(debug_level>1) console.log("getTopBlock");
     try {
       request(top_block, function(error,response,body) {
-        try {
+        if(!error && body) {
           var parsed=JSON.parse(body);
           status.keyblocks.top = parsed.height;
-        } catch(exception) {
-          console.log(exception);
-        } finally {
-          release();
+        } else {
+          console.log("getTopBlock" + error);
         }
+        release();
       });
     }
     catch(exception) {
@@ -107,7 +117,7 @@ function getBlock(release) {  //checks the current block height in the chain
   });
 }
 
-function requestBlock(height,release) {
+function requestBlock(height, release) {
   request(base_block+height, function(error,response,body) {
     if(!error) {
       var parsedblock
@@ -145,7 +155,7 @@ function requestBlock(height,release) {
             if(debug_level>0) console.log(new Date(parsedblock.key_block.time), parsedblock.key_block.height, status.keyblocks.top);
             //status.keyblocks.current = parsedblock.key_block.height; //Not needed, but useful.
           } else {
-            //console.log(error.errmsg, "getBlockData");
+            console.log(error.errmsg, "getBlockData");
           }
           release();
         });
@@ -154,7 +164,8 @@ function requestBlock(height,release) {
         release();
       }
     } else {
-      release();
+      console.log(error, "while requesting body for", height)
+      requestBlock(height, release);
     }
   });
 }
@@ -175,7 +186,15 @@ function getMicroBlock(release) {
                 if(!error) {
                   if(debug_level>0) console.log(parsedmicro.height, "getMicroBlock", parsedmicro.hash);
                 } else {
-                  //console.log(error.errmsg, "getMicroBlock");
+                  console.log(error.errmsg, "getMicroBlock");
+                  console.log(parsedmicro.hash)
+                  microblocks.findOne({_id:parsedmicro.hash},(txerr, txdoc) => {
+                    if(!txerr) {
+                      console.log(doc, parsedmicro, txdoc)
+//                      clearBlockData(txdoc.block_height)
+                    }
+                  })
+
                 }
                 pending.updateOne({_id:doc[0]._id},{$set:{mh:false,time:parsedmicro.time}},function(error, numModified) { release(); });
               });
@@ -211,6 +230,7 @@ function getTransaction(release) {
                 parsedtx.transactions[index].time = doc[0].time;
                 parsedtx.transactions[index]._id = parsedtx.transactions[index].hash;
               }
+              if(parsedtx.transactions.length > 0) {
               transactions.insertMany(parsedtx.transactions, function(error, docs) {
                 if(!error) {
                   for(index in docs.ops) {
@@ -218,12 +238,28 @@ function getTransaction(release) {
                   }
                   status.transactions.current = doc[0].height;
                 } else {
-                  //console.log(error.errmsg, "getTransaction");
+                  //if transction exist check if the transaction has the correct height
+                  //if the height is not the same destroy clear both blocks and let it resync
+                  //console.log(doc[0].height, 'clearBlockData', "getTransaction", status.transactions.current);
+                  //console.log(error, parsedtx)
+                  //console.log(error.result.result.writeErrors[0].err.op.block_height, "Was cleared")
+                  //transactions.findOne({_id:error.result.result.writeErrors[0].err.op.hash},(txerr, txdoc) => {
+                    //if(!txerr) {
+                      //console.log(doc, parsedtx, txdoc)
+                      //clearBlockData(txdoc.block_height)
+                      //process.exit()
+                    //}
+                  //})
+                  //TODO
                 }
                 pending.updateOne({_id:doc[0]._id},{$set:{th:false}},function(error, numModified) { release(); });
               });
+              } else {
+                //microblock is empty, no transactions to gather from this block.
+                pending.updateOne({_id:doc[0]._id},{$set:{th:false}},function(error, numModified) { release(); });
+              }
             } else {
-              pending.updateOne({_id:doc[0]._id},{$set:{th:"error"}},function(error, numModified) { release(); });
+              //pending.updateOne({_id:doc[0]._id},{$set:{th:"error"}},function(error, numModified) { release(); });
             }
           } catch(exception) {
             release();
@@ -267,17 +303,30 @@ function calcKeyblocks(release) {
       //status.microblocks.current = doc[0].key_block.height-1;
       pending.countDocuments({ height: doc[0].key_block.height, th: true },function (error, count) {
         if(!error && count==0) {
-          transactions.aggregate([ { $group: { _id: "$block_height", count: { $sum: 1 } } },
-                                   { $match: { _id: doc[0].key_block.height } } ]).toArray(function(error,result) {
-            if(!error && result.length==1) {
-              if(debug_level>0) console.log(result[0]._id,"found",result[0].count,"transactions");
-              keyblocks.updateOne({_id:result[0]._id},{$set:{txs_count:result[0].count}},function(error,numUpdated) {
+          transactions.countDocuments({  block_height: doc[0].key_block.height }, function(error,result) {
+            if(!error) {
+              if(debug_level>0) console.log(doc[0].key_block.height,"found",result,"transactions");
+              keyblocks.updateOne({_id:doc[0].key_block.height},{$set:{txs_count:result}},function(error,numUpdated) {
                 release();
               });
             } else {
-              if(result.length==0) {
-                console.log(doc[0].key_block.height, 'clearBlockData', 'because of an inconsistent state')
-                clearBlockData(doc[0].key_block.height)
+              if(result==0 && doc[0].key_block.height+20<status.keyblocks.top) {
+                console.log(doc[0].key_block.height, 'clearBlockData', 'called from calckeyblocks')
+
+                if ( status.reset.block >= doc[0].key_block.height ) {
+                  console.log(doc[0].key_block.height, 'clearBlockData', 'retry++')
+                  status.reset.retry++
+                } else {
+                  console.log(doc[0].key_block.height, 'clearBlockData', 'retry=1')
+                  status.reset.retry = 1
+                }
+
+                //for ( var index = 0; index <= status.reset.retry; index++ ) {
+                  console.log(doc[0].key_block.height, 'clearBlockData', doc[0].key_block.height-index)
+                  clearBlockData(doc[0].key_block.height)
+                //}
+                status.reset.block = doc[0].key_block.height
+
               }
               release();
             }
@@ -297,44 +346,39 @@ function clearBlockData(blockHeight) {
   microblocks.deleteMany({height:blockHeight},function(error, docs) {});
   transactions.deleteMany({block_height:blockHeight},function(error, docs) {});
   pending.deleteMany({height:blockHeight},function(error,docs) {});
-  requestBlock(blockHeight,function() {});
+  requestBlock(blockHeight, function(blockHeight) {});
+  console.log(blockHeight, "was cleared.")
 }
 
 function retryFailKeyblocks() {
   pending.find({ mh: "error"}).sort({height:1}).limit(1).toArray(function(error, results) {
     for(i in results) {
-      clearBlockData(results[i].height)
+      if (results[i].height > status.keyblocks.top - 5000) {
+        clearBlockData(results[i].height)
+      }
     }
   });
   keyblocks.find({txs_count:{$exists:false}}).sort({_id:1}).limit(1).toArray(function(error, results) {
     for(i in results) {
       pending.countDocuments({height:results[i]._id},function(error, count) {
-        if(!error && count==0) {
-          keyblocks.deleteOne({_id:results[i]._id},function(error, docs) {});
-          microblocks.deleteMany({height:results[i]._id},function(error, docs) {});
-          transactions.deleteMany({block_height:results[i]._id},function(error, docs) {});
-          pending.deleteMany({height:results[i]._id},function(error,docs) {});
-          requestBlock(results[i]._id,function() {});
+        if(!error && count==0 && results[i].height > status.keyblocks.top - 5000) {
+          clearBlockData(results[i]._id)
+        }
+      });
+    }
+  });
+  keyblocks.find({micro_blocks: { $not: {$size: 0}}, txs_count: 0}).sort({_id:1}).limit(1).toArray(function(error, results) {
+    for(i in results) {
+      pending.countDocuments({height:results[i]._id},function(error, count) {
+        if(!error && count==0 && results[i].height > status.keyblocks.top - 5000) {
+          clearBlockData(results[i]._id)
         }
       });
     }
   });
 }
 
-function pendingTransactions() {
-  transactions.countDocuments({},function(error, results) {
-    status.transactions.processed = results;
-  });
-  microblocks.countDocuments({},function(error, results) {
-    status.microblocks.processed = results;
-  });
-  pending.countDocuments({mh:true},function(error,results){
-    status.microblocks.pending = results;
-  });
-}
-
 setInterval(function() {
-  pendingTransactions();
   if(debug_level>=0) {
     text = (new Date()).toISOString()+" KB:{";
     if(status.microblocks.current) text += "pro:"+status.microblocks.current+",";
@@ -345,4 +389,4 @@ setInterval(function() {
     if(status.transactions.processed) text += " TX:"+status.transactions.processed;
     console.log(text);
   }
-},pollsleep);
+},pollsleep*10);
