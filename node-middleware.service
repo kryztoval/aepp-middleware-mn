@@ -1,0 +1,16 @@
+[Unit]
+Description=Node Aeternity middleware - calculating what the node does not
+After=hamachi.service
+Requires=hamachi.service
+
+[Service]
+ExecStartPre=/bin/sleep 15
+Type=simple
+User=root
+ExecStart=/usr/local/bin/node /opt/middleware/middleware.js
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
+

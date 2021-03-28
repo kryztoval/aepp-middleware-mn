@@ -1,0 +1,15 @@
+[Unit]
+Description=Node Aeternity middleware server - http/https server for the aeternity middleware
+After=mongod.service
+Requires=mongod.service
+
+[Service]
+ExecStartPre=/bin/sleep 15
+Type=simple
+User=root
+ExecStart=/usr/local/bin/node /opt/middleware/middleware-server.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
