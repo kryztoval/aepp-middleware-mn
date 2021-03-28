@@ -1,5 +1,6 @@
 [Unit]
 Description=Node Aeternity middleware server - http/https server for the aeternity middleware
+Documentation=https://ae.criesca.net/
 After=mongod.service
 Requires=mongod.service
 
@@ -7,9 +8,8 @@ Requires=mongod.service
 ExecStartPre=/bin/sleep 15
 Type=simple
 User=root
-ExecStart=/usr/local/bin/node /opt/middleware/middleware-server.js
+ExecStart=/usr/bin/node /opt/middleware/middleware-server.js
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
-
