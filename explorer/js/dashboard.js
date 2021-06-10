@@ -29,7 +29,8 @@ function loadLast() {
         $("#microblocks").text(data.micro_blocks.length);
         $("#transactions")[0].innerHTML = "<a class='tx-count' href='./transactions.html?from="+data._id+"'>"+data.txs_count+"</a>"
             //.text(data.txs_count);
-        $("#hash").text(shortenString(data.key_block.hash));
+        //$("#hash").text(shortenString(data.key_block.hash));
+        $("#hash")[0].innerHTML = "<a href='./blocks.html?hash=" + data.key_block.hash + "'>"+shortenString(data.key_block.hash)+"</a"
         $("#beneficiary")[0].innerHTML =
             "<a href='./address.html?address=" + data.key_block.beneficiary + "'>" + shortenString(data.key_block.beneficiary) + "</a>";
         $("#age")[0].innerHTML =

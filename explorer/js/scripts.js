@@ -104,27 +104,28 @@ function transverse(obj, result) {
               if(typeof(obj[i]) == "string" && obj[i].startsWith("ba_")) {
                 r = atob(obj[i].substr(3))
                 if(r.length > 4) {
-                  processed = "<span title='" + obj[i] + "'>" + r.substr(0,r.length-4) + "</span> " 
+                  processed = "<span title='" + obj[i] + "'>" + r.substr(0,r.length-4) + "</span> "
                 }
                 break;
               }
-            case "prev_hash": case "prev_key_hash": //kh_
-            case "block_hash": case "prev_hash":  //mh_
-            case "hash": //th_ mh_ kh_
-              if(typeof(obj[i]) == "string" && obj[i].startsWith("th_")) {
-                processed = "<a href='/explorer/tx.html?hash=" + obj[i] + "'>" + obj[i] + "</a>"
-                break;
-              }
-              if(typeof(obj[i]) == "string" && obj[i].startsWith("mh_")) {
-                processed = "<a href='/explorer/blocks.html?microblock=" + obj[i] + "'>" + obj[i] + "</a>"
-                break;
-              }
-              if(typeof(obj[i]) == "string" && obj[i].startsWith("kh_")) {
-                processed = "<a href='/explorer/blocks.html?hash=" + obj[i] + "'>" + obj[i] + "</a>"
-                break;
-              }
             default:
-              processed = obj[i]
+              if(typeof(obj[i]) == "string" && obj[i].substring(1,3) == "h_") {
+                if(obj[i].startsWith("th_")) {
+                  processed = "<a href='/explorer/tx.html?hash=" + obj[i] + "'>" + obj[i] + "</a>"
+                  break;
+                }
+                if(obj[i].startsWith("mh_")) {
+                  processed = "<a href='/explorer/blocks.html?microblock=" + obj[i] + "'>" + obj[i] + "</a>"
+                  break;
+                }
+                if(obj[i].startsWith("kh_")) {
+                  processed = "<a href='/explorer/blocks.html?hash=" + obj[i] + "'>" + obj[i] + "</a>"
+                  break;
+                }
+                processed = obj[i] + ' *'
+              } else {
+                processed = obj[i]
+              }
           }
           result += "<tr><td class='text-primary'>" + i + "</td>" +
                     "<td>" + processed + "</td>" +
