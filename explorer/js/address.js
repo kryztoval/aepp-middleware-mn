@@ -8,6 +8,7 @@ if(GetURLParameter('address')) {
   //type = GetURLParameter('type');
   $("#address")[0].textContent = shortenString(address);
   jQuery.get("/v2/accounts/"+address, function(data, textStatus, jqXJR) {
+    if(data.contains("html")) return;
     data = JSON.parse(data)
     $("#raw")[0].textContent = JSON.stringify(data).replace(/,/g,", ");
     $("#raw")[0].innerHTML = convertToTable(data);

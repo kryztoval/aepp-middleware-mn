@@ -248,15 +248,15 @@ function tryConnect () {
       transactions = client.db(mongo_db).collection('transactions')
       keyblocks = client.db(mongo_db).collection('keyblocks')
 
-      if (httpport) {
-        http_server.listen(httpport, function () {
-          console.log('%s listening at %s', http_server.name, http_server.url)
-        })
-      }
-
       if (httpsport) {
         https_server.listen(httpsport, function () {
           console.log('%s listening at %s', https_server.name, https_server.url)
+        })
+      }
+
+      if (httpport) {
+        http_server.listen(httpport, function () {
+          console.log('%s listening at %s', http_server.name, http_server.url)
         })
       }
     } else {
@@ -311,6 +311,7 @@ function nodeForward(req, res, next) {
   console.log(req.headers["x-forwarded-for"]||req.connection.remoteAddress,"---",req.url);
 
   request(base_url+req.url, { json: true }, (err, resp, body) => {
+    console.log(err, resp, body);
     if (err) { return console.log(err); }
     else {
       if(body) {
