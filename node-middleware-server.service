@@ -9,7 +9,9 @@ ExecStartPre=/bin/sleep 15
 Type=simple
 User=root
 ExecStart=/usr/bin/node /opt/middleware/middleware-server.js
-Restart=on-failure
+#Restart=on-failure
+Restart=always
+RuntimeMaxSec=259200
 
 [Install]
 WantedBy=multi-user.target

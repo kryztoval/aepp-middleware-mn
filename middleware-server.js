@@ -300,6 +300,8 @@ function getKeyblockCurrentHeight(req, res, next) {
   keyblocks.find({}).sort({_id:-1}).limit(1).toArray(function(error, docs) {
     if(!error && docs.length == 1) {
       res.write( JSON.stringify({height:docs[0]._id}) );
+    } else {
+      res.write( JSON.stringify({error: error}) );
     }
     res.end();
   });
